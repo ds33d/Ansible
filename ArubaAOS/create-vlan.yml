@@ -1,0 +1,14 @@
+- name: SSH Test
+  hosts: all
+  gather_facts: false
+  collections:
+    - arubanetworks.aoscx
+  tasks:
+    - name: add vlan 1000
+      arubanetworks.aos_switch.arubaoss_command:
+        commands:
+          - wr mem
+          - config
+          - vlan 1000
+          - name TEST
+          - wr mem
