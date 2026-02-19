@@ -1,0 +1,40 @@
+EXAMPLES:
+- name: First delete VLAN 44, then configure VLAN 45, and lastly create VLAN 46
+  arubaoss_config:
+    before:
+      - no vlan 44
+    parents:
+      - vlan 45
+    lines:
+      - name testvlan
+      - untagged 1-6
+    after:
+      - vlan 46
+- name: Back up running-config, then configure TACACS, and save running-config to startup-config if change was made
+  arubaoss_config:
+    backup: True
+    lines:
+      - tacacs-server host 192.168.8.1 key "ArubaR0Cks!"
+      - tacacs-server host 192.168.8.1 oobm
+    backup_options:
+      filename: backup.cfg
+      dir_path: /users/Home/
+    save_when: changed
+- name: Compare running-config with saved config
+  arubaoss_config:
+    diff_against: intended
+    intended_config: /users/Home/backup.cfg
+- name: Configure VLAN 2345 and compare resulting running-config with previous running-config
+  arubaoss_config:
+    lines:
+      - vlan 2345
+    diff_against: running
+- name: Upload a config from local system file onto device
+  arubaoss_config:
+    src:  /users/Home/golden.cfg
+- name: Update vlan 46, matching only if both "parents" and "lines" are present
+  arubaoss_config:
+    lines:
+      - ip address 4.4.4.5/24
+    parents: vlan 46
+    match: strict
