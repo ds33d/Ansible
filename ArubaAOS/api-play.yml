@@ -1,0 +1,19 @@
+---
+- name: AOS-Switch VLAN Config
+  hosts: all
+  gather_facts: false
+  collections:
+    - arubanetworks.aos_switch
+  tasks:
+    - name: Create VLAN 300
+      arubanetworks.aos_switch.arubaoss_vlan:
+        vlan_id: 300
+        name: "vlan300"
+        config: "create"
+        command: config_vlan
+        provider:
+          host: "{{ ansible_host }}"
+          username: "{{ ansible_user }}"
+          password: "{{ ansible_password }}"
+          use_ssl: true
+          validate_certs: false
