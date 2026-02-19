@@ -1,0 +1,12 @@
+---
+- name: SSH Test
+  hosts: all
+  gather_facts: false
+  collections:
+    - arubanetworks.aoscx
+  tasks:
+    - name: Show running-config
+      arubanetworks.aos_switch.arubaoss_command:
+        commands:
+          - show running-config
+            host_key_checking = false
