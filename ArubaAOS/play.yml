@@ -9,4 +9,3 @@
       arubanetworks.aos_switch.arubaoss_command:
         commands:
           - show running-config
-            host_key_checking = false
