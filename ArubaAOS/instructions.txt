@@ -38,6 +38,7 @@ ansible-galaxy install ansible.netcommon
 Ansible’s network_cli plugin requires either Paramiko or ansible‑pylibssh (libssh‑based) to be installed in the same Python interpreter running Ansible. [github.com]
 pip install paramiko
 pip install ansible-pylibssh
+apt-get install -y python3-paramiko
 
 #Prepare the AOS‑CX Switch for SSH Access
 On the switch, the SSH server must be enabled
