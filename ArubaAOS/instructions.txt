@@ -1,0 +1,97 @@
+#Install Ubuntu or your favorite flavor of Linux
+
+#Update system
+apt update && apt full-upgrade -y 
+
+#Verify python is install
+python3
+CTRL + D
+
+#Install python-venv
+apt install python3-venv -y
+
+#Create a virtual environment:
+python3 -m venv ~/aoscx-venv
+
+
+Activate it:
+source ~/aoscx-venv/bin/activate
+
+
+#Install Ansible Inside the Virtual Environment.
+pip install --upgrade pip setuptools wheel
+pip install ansible
+
+#Verify with:
+which ansible-playbook
+It should show something similar to: /aoscx-venv/bin/ansible-playbook
+
+#Install the Aruba AOS‑CX Ansible Collection Inside the venv
+ansible-galaxy collection install arubanetworks.aoscx
+
+#If you are using AOS use this:
+ansible-galaxy collection install arubanetworks.aos_switch
+ansible-galaxy install ansible.netcommon
+
+
+#Install an SSH Transports for network_cli
+Ansible’s network_cli plugin requires either Paramiko or ansible‑pylibssh (libssh‑based) to be installed in the same Python interpreter running Ansible. [github.com]
+pip install paramiko
+pip install ansible-pylibssh
+
+#Prepare the AOS‑CX Switch for SSH Access
+On the switch, the SSH server must be enabled
+configure terminal
+ssh server vrf mgmt
+
+#I created an ansible directory to keep things in. Such as my host file and playbooks
+mkdir ansible-cx
+cd ansible-cx
+
+#Create a hosts file in your ansible-cx repo
+vi hosts
+Example:
+all:
+  hosts:
+    switch1:
+      ansible_host: 10.1.0.1       # Real IP or resolvable hostname
+      ansible_user: admin
+      ansible_password: your_password
+      ansible_connection: network_cli
+      ansible_network_os: arubanetworks.aoscx.aoscx
+      ansible_ssh_port: 22
+
+#If you are curious what other modules (options) exist in the Collection. Try this
+ansible-doc arubanetworks.aos_switch -l
+ansible-doc arubanetworks.aoscx  -l 
+
+#If you are using AOS change the network_os to:
+arubanetworks.aos_switch.arubaoss 
+
+#Inventory validated with:
+ansible-inventory -i hosts --graph
+ansible-inventory --list -i hosts
+
+#Create a Playbook for SSH Modules
+A simple test playbook was created to confirm SSH CLI execution:
+vi play.yml
+---
+- name: CX SSH Test
+  hosts: all
+  gather_facts: false
+  collections:
+    - arubanetworks.aoscx
+  tasks:
+    - name: Show running-config
+      aoscx_command:
+        commands:
+          - show running-config
+
+#If you are using AOS
+collections is arubanetworks.aos_switch, and module is arubaoss_command
+
+#NOTE! Before you run this Play. Prevent Ansible from caring about the keys. Unless you import the SSH keys into known_hosts
+export ANSIBLE_HOST_KEY_CHECKING=False
+
+#Run the Playbook Using the Venv Ansible
+ansible-playbook -i hosts play.yml -vvv (-vvv just means very verbose!)
