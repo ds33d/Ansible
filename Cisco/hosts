@@ -1,0 +1,10 @@
+all:
+  children:
+    access_switches:
+      hosts:
+        SWITCH1:
+          ansible_host: 10.10.10.10
+          int_prefix: "Gi1/0/"
+          access_sets:
+            - vlan: 3333
+              ports: [4, 5, 6]
